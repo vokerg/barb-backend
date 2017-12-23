@@ -8,14 +8,12 @@ module.exports = (app, db) => {
     });
   });
 
-  module.exports = (app, db) => {
-    app.get('/shops/:id', (req, res) => {
-      const id = {_id: new ObjectId(req.params.id)};
-      db.collection('shops').find(id).toArray((err, docs) => {
-        res.send(docs);
-      });
+  app.get('/shops/:id', (req, res) => {
+    const id = {_id: new ObjectId(req.params.id)};
+    db.collection('shops').find(id).toArray((err, docs) => {
+      res.send(docs);
     });
-  };
+  });
 
   app.post('/shops', (req, res) => {
     const shop = {...req.body, ratings:[]};
