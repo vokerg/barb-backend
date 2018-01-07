@@ -10,8 +10,8 @@ module.exports = (app, db) => {
 
   app.get('/shops/:id', (req, res) => {
     const id = {_id: new ObjectId(req.params.id)};
-    db.collection('shops').find(id).toArray((err, docs) => {
-      res.send(docs);
+    db.collection('shops').find(id).toArray((err, shop) => {
+      res.send(shop);
     });
   });
 
@@ -26,4 +26,5 @@ module.exports = (app, db) => {
     db.collection('shops').deleteMany({});
     res.send("Done");
   });
+  
 };
