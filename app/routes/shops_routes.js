@@ -3,7 +3,10 @@ var {ObjectId} = require('mongodb');
 module.exports = (app, db) => {
 
   app.get('/shops/', (req, res) => {
-    db.collection('shops').find().toArray((err, docs) => {
+    let {filter} = req.query;
+    filter = filter==='favorites' ? {'favorited':'true'} : {}
+    console.log(filter);
+    db.collection('shops').find(filter).toArray((err, docs) => {
       res.send(docs);
     });
   });
@@ -26,5 +29,5 @@ module.exports = (app, db) => {
     db.collection('shops').deleteMany({});
     res.send("Done");
   });
-  
+
 };
