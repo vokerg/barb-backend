@@ -3,10 +3,10 @@ var {ObjectId} = require('mongodb');
 module.exports = (app, db) => {
 
   app.get('/shops/', (req, res) => {
-    let {filter} = req.query;
+    let {filter, service} = req.query;
     filter = filter==='favorites' ? {'favorited':'true'} : {}
-    console.log(filter);
-    db.collection('shops').find(filter).toArray((err, docs) => {
+    service = service!=='' ? {'services':service} : {}
+    db.collection('shops').find({...filter, ...service}).toArray((err, docs) => {
       res.send(docs);
     });
   });
