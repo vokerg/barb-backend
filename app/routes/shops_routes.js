@@ -5,7 +5,7 @@ module.exports = (app, db) => {
   app.get('/shops/', (req, res) => {
     let {filter, service} = req.query;
     filter = filter==='favorites' ? {'favorited':'true'} : {}
-    service = service!=='' ? {'services':service} : {}
+    service = (service!=='' && (service !== undefined)) ? {'services':service} : {}
     db.collection('shops').find({...filter, ...service}).toArray((err, docs) => {
       res.send(docs);
     });
@@ -18,7 +18,18 @@ module.exports = (app, db) => {
     });
   });
 
-  app.post('/shops', (req, res) => {
+  app.post('/shops/:id', (req, res) => {
+    const id = {_id: new ObjectId(req.params.id)};
+    db.collection('shops').findOne(id, (err, shop) => {
+      shop = {
+        ...shop,
+        ...req.body
+      };
+      db.collection('shops').update(id, shop, (err, result) => res.send(shop));
+    });
+  });
+
+  app.put('/shops', (req, res) => {
     const shop = {...req.body, ratings:[]};
     db.collection('shops').insert(shop, (err, result) => {
       res.send(shop);
