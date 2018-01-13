@@ -30,7 +30,12 @@ module.exports = (app, db) => {
   });
 
   app.put('/shops', (req, res) => {
-    const shop = {...req.body, ratings:[]};
+    let {ratings, services} = req.body
+    const shop = {
+      ...req.body,
+      ratings: (ratings!==undefined) ? ratings : [] ,
+      services: (services !== undefined) ? services : []
+    };
     db.collection('shops').insert(shop, (err, result) => {
       res.send(shop);
     });
