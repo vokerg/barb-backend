@@ -4,11 +4,16 @@ module.exports = (app, db) => {
 
   app.get('/shops/', (req, res) => {
     let {filter, service} = req.query;
-    filter = filter==='favorites' ? {'favorited':'true'} : {}
-    service = (service!=='' && (service !== undefined)) ? {'services':service} : {}
-    db.collection('shops').find({...filter, ...service}).toArray((err, docs) => {
-      res.send(docs);
-    });
+    filter = filter==='favorites' ? {'favorited':'true'} : {};
+    service = (service!=='' && (service !== undefined)) ? {'services':service} : {};
+    db.collection('shops')
+      .find(
+        {...filter, ...service}
+      )
+      .toArray((err, docs) => {
+        res.send(docs);
+      }
+    );
   });
 
   app.get('/shops/:id', (req, res) => {
@@ -31,6 +36,7 @@ module.exports = (app, db) => {
 
   app.put('/shops', (req, res) => {
     let {ratings, services} = req.body
+    console.log(req.body)
     const shop = {
       ...req.body,
       ratings: (ratings!==undefined) ? ratings : [] ,
