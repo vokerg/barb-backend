@@ -1,0 +1,5 @@
+{
+  "db": "mongodb://vokerg:123@ds131137.mlab.com:31137/barb",
+  "jwtSecret": "top secret",
+  "authenticate": true
+}

@@ -7,9 +7,15 @@ module.exports = (app) => {
     session: false
   }));
 
-  app.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/',
-    failureRedirect: '/error',
-    session: false
-  }));
+  app.post('/login', (req, res, next) => {
+    return passport.authenticate('local-login',
+      (err, token) => {
+        return res.json({
+          success: "true",
+          token,
+        })
+      }
+    )(req, res, next);
+  }
+  );
 };
