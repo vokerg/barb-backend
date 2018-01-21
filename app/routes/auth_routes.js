@@ -10,10 +10,17 @@ module.exports = (app) => {
   app.post('/login', (req, res, next) => {
     return passport.authenticate('local-login',
       (err, token) => {
-        return res.json({
-          success: "true",
-          token,
-        })
+        if (!err) {
+          return res.json({
+            success: "true",
+            token,
+          })
+        }
+        else {
+          return res.status(400).json({
+            success: "false",
+          })
+        }
       }
     )(req, res, next);
   }
