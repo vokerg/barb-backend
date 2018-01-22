@@ -9,10 +9,11 @@ module.exports = (app) => {
 
   app.post('/login', (req, res, next) => {
     return passport.authenticate('local-login',
-      (err, token) => {
+      (err, userId, token) => {
         if (!err) {
           return res.json({
             success: "true",
+            userId,
             token,
           })
         }
