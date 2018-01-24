@@ -1,5 +1,7 @@
 var {ObjectId} = require('mongodb');
 
+const authenticate = require('../passport/authenticate')
+
 module.exports = (app, db) => {
 
   app.get('/shops/', (req, res) => {
@@ -23,33 +25,31 @@ module.exports = (app, db) => {
     });
   });
 
-  app.post('/shops/:id', (req, res) => {
-    const id = {_id: new ObjectId(req.params.id)};
-    db.collection('shops').findOne(id, (err, shop) => {
-      shop = {
-        ...shop,
-        ...req.body
+  app.post('/shops/:id', (req, res) =>
+    authenticate(req, res, () => {
+      const id = {_id: new ObjectId(req.params.id)};
+      db.collection('shops').findOne(id, (err, shop) => {
+        shop = {
+          ...shop,
+          ...req.body
+        };
+        db.collection('shops').update(id, shop, (err, result) => res.send(shop));
+      });
+    })
+  );
+
+  app.put('/shops', (req, res) =>
+    authenticate(req, res, () => {
+      let {ratings, services} = req.body
+      console.log(req.body)
+      const shop = {
+        ...req.body,
+        ratings: (ratings!==undefined) ? ratings : [] ,
+        services: (services !== undefined) ? services : []
       };
-      db.collection('shops').update(id, shop, (err, result) => res.send(shop));
-    });
-  });
-
-  app.put('/shops', (req, res) => {
-    let {ratings, services} = req.body
-    console.log(req.body)
-    const shop = {
-      ...req.body,
-      ratings: (ratings!==undefined) ? ratings : [] ,
-      services: (services !== undefined) ? services : []
-    };
-    db.collection('shops').insert(shop, (err, result) => {
-      res.send(shop);
-    });
-  });
-
-  app.delete('/shops', (req, res) => {
-    db.collection('shops').deleteMany({});
-    res.send("Done");
-  });
-
+      db.collection('shops').insert(shop, (err, result) => {
+        res.send(shop);
+      });
+    })
+  );
 };
