@@ -1,18 +1,32 @@
 const passport = require('passport');
 
 module.exports = (app) => {
-  app.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/login',
-    failureRedirect: '/error',
-    session: false
-  }));
+  app.post('/signup', (req, res) => {
+      return passport.authenticate('local-signup',
+        (err, success, user) => {
+          if (!err && success) {
+            return res.json({
+              success,
+              userId: user._id
+            })
+          }
+          else {
+            return res.status(409).json({
+              success: "false",
+              message: "Can't create user"
+            })
+          }
+        }
+      )(req, res);
+  });
 
   app.post('/login', (req, res, next) => {
     return passport.authenticate('local-login',
-      (err, userId, token) => {
-        if (!err) {
+      (error, success, user) => {
+        if (!error && success) {
+          const {userId, token} = user
           return res.json({
-            success: "true",
+            success,
             userId,
             token,
           })
@@ -20,6 +34,7 @@ module.exports = (app) => {
         else {
           return res.status(400).json({
             success: "false",
+            error
           })
         }
       }

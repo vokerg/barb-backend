@@ -1,5 +1,6 @@
 const PassportLocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = db => new PassportLocalStrategy(
   {
@@ -7,17 +8,24 @@ module.exports = db => new PassportLocalStrategy(
     passReqToCallback: true
   },
   (req, username, password, done) => {
-    db.collection('users').find({username, password}).toArray((err, users) => {
+    return db.collection('users').find({username}).toArray((err, users) => {
       if (users.length !== 1) {
-        //done("incorrect usename or password")
-        const error = new Error('Incorrect email or password');
-        error.name = 'IncorrectCredentialsError';
-        return done(error);
+        return done("Incorrect username");
       } else {
-        const userId = users[0]._id
-        const payload = {userId};
-        var token = jwt.sign(payload, require('../../config').jwtSecret);
-        done(null, userId, token)
+        bcrypt.compare(password, users[0].password, (err, res) => {
+          if (err) {
+            return done(err, false)
+          }
+          if (res) {
+            const userId = users[0]._id
+            const payload = {userId};
+            var token = jwt.sign(payload, require('../../config').jwtSecret);
+            done(null, true, {userId, token})
+          }
+          else {
+            return done("Incorrect password")
+          }
+        })
       }
     })
   }
