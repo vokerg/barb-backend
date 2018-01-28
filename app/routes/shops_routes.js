@@ -1,6 +1,6 @@
 var {ObjectId} = require('mongodb');
 
-const authenticate = require('../passport/authenticate')
+const authenticate = require('../passport/authenticate');
 
 module.exports = (app, db) => {
 
