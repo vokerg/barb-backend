@@ -1,4 +1,5 @@
 const passport = require('passport');
+const { getLoginResponseObject } = require('../utils')
 
 module.exports = (app) => {
   app.post('/signup', (req, res) => {
@@ -24,12 +25,8 @@ module.exports = (app) => {
     return passport.authenticate('local-login',
       (error, success, user) => {
         if (!error && success) {
-          const {userId, token} = user
-          return res.json({
-            success,
-            userId,
-            token,
-          })
+          //const {userId, token} = user
+          return res.json(getLoginResponseObject(user));
         }
         else {
           return res.status(400).json({

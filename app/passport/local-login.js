@@ -17,10 +17,9 @@ module.exports = db => new PassportLocalStrategy(
             return done(err, false)
           }
           if (res) {
-            const userId = users[0]._id
-            const payload = {userId};
-            var token = jwt.sign(payload, require('../../config').jwtSecret);
-            done(null, true, {userId, token})
+            //const userId = users[0]._id
+            //const token = getJwtToken(userId);
+            done(null, true, users[0])
           }
           else {
             return done("Incorrect password")

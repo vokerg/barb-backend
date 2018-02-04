@@ -5,6 +5,8 @@ const passport = require('passport');
 const localSignupStrategy = require('./app/passport/local-signup');
 const localLoginStrategy = require('./app/passport/local-login');
 
+var Strategy = require('passport-facebook').Strategy;
+
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));

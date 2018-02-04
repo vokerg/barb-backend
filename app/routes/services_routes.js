@@ -6,4 +6,4 @@ module.exports = (app, db) => {
       res.send(docs)
     })
   });
-}
+};

@@ -41,7 +41,6 @@ module.exports = (app, db) => {
   app.put('/shops', (req, res) =>
     authenticate(req, res, () => {
       let {ratings, services} = req.body
-      console.log(req.body)
       const shop = {
         ...req.body,
         ratings: (ratings!==undefined) ? ratings : [] ,

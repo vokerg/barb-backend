@@ -11,6 +11,6 @@ module.exports = (app, db) => {
       db.collection("bookings").insert(booking, (err, result) => {
         res.send(result)
       });
-    })
-  })
+    });
+  });
 };
