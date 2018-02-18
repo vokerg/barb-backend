@@ -1,17 +1,21 @@
 const { ObjectId } = require('mongodb');
 const authenticate = require('../passport/authenticate');
+const { getAggregateBookingsJson } = require("./mongo_helper");
 
 module.exports = (app, db) => {
   app.put('/shops/:id/bookings', (req, res) => {
+
     authenticate(req, res, () => {
       const booking = {
         ...req.body,
         shopId: req.params.id
       };
+      console.log(booking, booking.date, new Date(booking.date))
       db.collection("bookings").insert({
         ...booking,
         userId: new ObjectId(booking.userId),
-        shopId: new ObjectId(booking.shopId)
+        shopId: new ObjectId(booking.shopId),
+        date: new Date(booking.date)
       }, (err, result) => {
         res.send(result)
       });
@@ -19,50 +23,15 @@ module.exports = (app, db) => {
   });
 
   app.get('/shops/:id/bookings', (req, res) => {
+    console.log(new Date())
     //authenticate(req, res, () => {
-      db.collection("bookings").aggregate(
-        [
-          {
-            $lookup:
-              {
-                from: "shops",
-                localField: "shopId",
-                foreignField: "_id",
-                as: "shops_docs"
-              }
-          }
-          ,{
-            $unwind: "$shops_docs"
-          },
-          {
-            $lookup:
-              {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "users_docs"
-              }
-          },
-          {
-            $unwind: "$users_docs"
-          }
-          ,{
-            $project:
-              {
-                "_id": 1,
-                "userId": 1,
-                "shopId": 1,
-                "shopname": "$shops_docs.name",
-                "username": "$users_docs.username"
-              }
-          },
-          {
-            $match:
-              {
-                shopId: new ObjectId("5a5b6afbcea79c26d490f533")
-              }
-          }
-        ]
+      const id = {_id: new ObjectId(req.params.id)};
+      db.collection("bookings")
+        //.aggregate(getAggregateBookingsJson(id))
+        .find(
+          {date: {
+          $lt: new Date()
+        }}
       )
         .toArray((err, bookings) => {
         res.send(bookings);
