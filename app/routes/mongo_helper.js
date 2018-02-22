@@ -1,49 +1,49 @@
 const { ObjectId } = require('mongodb');
 
 module.exports = {
-  getAggregateBookingsJson: id => {
-    return
-      [
+  getAggregateBookingsJson: (id, match) => {
+    let aggregateJson = [
         {
-          $lookup:
-            {
+          $lookup: {
               from: "shops",
               localField: "shopId",
               foreignField: "_id",
               as: "shops_docs"
-            }
+          }
         }
         ,{
           $unwind: "$shops_docs"
         },
         {
-          $lookup:
-            {
+          $lookup: {
               from: "users",
               localField: "userId",
               foreignField: "_id",
               as: "users_docs"
-            }
+          }
         },
         {
           $unwind: "$users_docs"
         }
         ,{
-          $project:
-            {
+          $project: {
               "_id": 1,
               "userId": 1,
               "shopId": 1,
+              "status": 1,
+              "date": 1,
+              "comment": 1,
               "shopname": "$shops_docs.name",
               "username": "$users_docs.username"
-            }
-        },
-        {
-          $match:
-            {
-              shopId: id
-            }
+          }
         }
-      ]
+      ];
+
+      if (Object.keys(match).length > 0){
+          aggregateJson.push({
+            $match:{...match}
+          });
+      }
+      return aggregateJson;
     }
 }

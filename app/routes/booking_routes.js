@@ -8,9 +8,9 @@ module.exports = (app, db) => {
     authenticate(req, res, () => {
       const booking = {
         ...req.body,
-        shopId: req.params.id
+        shopId: req.params.id,
+        status: 'Unprocessed'
       };
-      console.log(booking, booking.date, new Date(booking.date))
       db.collection("bookings").insert({
         ...booking,
         userId: new ObjectId(booking.userId),
@@ -23,16 +23,20 @@ module.exports = (app, db) => {
   });
 
   app.get('/shops/:id/bookings', (req, res) => {
-    console.log(new Date())
+    let {status, time} = req.query;
+
+    let timeObject = {};
+    switch(time) {
+      case 'Past': timeObject = {date: {$lt: new Date()}}; break;
+      case 'Future': timeObject = {date: {$gte: new Date()}}; break;
+    };
+
+    let statusObject = (status === undefined || status==='All') ? {} : {'status': status};
+
     //authenticate(req, res, () => {
       const id = {_id: new ObjectId(req.params.id)};
       db.collection("bookings")
-        //.aggregate(getAggregateBookingsJson(id))
-        .find(
-          {date: {
-          $lt: new Date()
-        }}
-      )
+        .aggregate(getAggregateBookingsJson(id, {...timeObject, ...statusObject}))
         .toArray((err, bookings) => {
         res.send(bookings);
       })
