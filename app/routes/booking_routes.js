@@ -42,4 +42,17 @@ module.exports = (app, db) => {
       })
     //})
   });
+
+  app.post('/shops/:shopId/bookings/:bookingId', (req, res) => {
+    const shopId = {shopId: new ObjectId(req.params.shopId)};
+    const bookingId = {_id: new ObjectId(req.params.bookingId)};
+    db.collection("bookings").findOne({...bookingId, ...shopId}, (err, booking) => {
+      const {status} = req.body;
+      booking = {
+        ...booking,
+        status
+      }
+      db.collection("bookings").update(shopId, booking, (err, result) => res.send(booking));
+    })
+  })
 };
