@@ -6,22 +6,38 @@ module.exports = (app, db) => {
   app.put('/shops/:id/ratings', (req, res) =>
   {
     authenticate(req, res, () => {
-      const id = {
-        _id: new ObjectId(req.params.id)
-      };
-      const {shopId, author, rating, comment} = req.body;
-      db.collection("shops").findOne(id, (err, shop) => {
-        shop = {
-          ...shop,
-          ratings:[
-            ...shop.ratings,
-            {author, comment, rating}
-          ]
+      const {userId, shopId, author, rating, comment} = req.body;
+      if (userId !== null) {
+        const userId = {
+          _id: new ObjectId(userId)
         };
-        db.collection("shops").update(id, shop, (err, result) => {
-          res.send(shop);
-        });
-      });
-    })
+        db.collection("users").findOne(userId, (err, user) => {
+          const ratingInstance = {author: user.username, shopId, rating, comment};
+          addRating(db, ratingInstance, dbRatingInstance => res.send(dbRatingInstance));
+        })
+      } else {
+        const ratingInstance = {author, shopId, rating, comment};
+        addRating(db, ratingInstance, dbRatingInstance => res.send(dbRatingInstance));
+      }
+    });
   });
 };
+
+addRating(db, ratingInstance, next) => {
+  const {shopId, author, comment, rating} = ratingInstance;
+  const id = {
+    _id: new ObjectId(req.params.id)
+  };
+  db.collection("shops").findOne(id, (err, shop) => {
+    shop = {
+      ...shop,
+      ratings:[
+        ...shop.ratings,
+        {author, comment, rating}
+      ]
+    };
+    db.collection("shops").update(id, shop, (err, result) => {
+      res.send(shop);
+    });
+  });
+}

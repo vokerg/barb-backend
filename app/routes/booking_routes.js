@@ -44,6 +44,7 @@ module.exports = (app, db) => {
   });
 
   app.post('/shops/:shopId/bookings/:bookingId', (req, res) => {
+    console.log("params:", req.params.shopId, req.params.bookingId)
     const shopId = {shopId: new ObjectId(req.params.shopId)};
     const bookingId = {_id: new ObjectId(req.params.bookingId)};
     db.collection("bookings").findOne({...bookingId, ...shopId}, (err, booking) => {
