@@ -23,7 +23,7 @@ module.exports = (app, db) => {
   });
 };
 
-addRating(db, ratingInstance, next) => {
+addRating = (db, ratingInstance, next) => {
   const {shopId, author, comment, rating} = ratingInstance;
   const id = {
     _id: new ObjectId(req.params.id)
@@ -37,7 +37,7 @@ addRating(db, ratingInstance, next) => {
       ]
     };
     db.collection("shops").update(id, shop, (err, result) => {
-      res.send(shop);
+      next(shop);
     });
   });
 }
