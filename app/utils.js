@@ -9,7 +9,9 @@ const getLoginResponseObject = (user, token=getJwtToken(user.id)) => ({
     success: true,
     userId: user._id,
     token,
-    username: user.username
+    username: user.username,
+    admin: ((user.admin !== undefined) ? user.admin : false),
+    moderateShops: ((user.moderateShops !== undefined) ? user.moderateShops : [])
   });
 
 module.exports = {
