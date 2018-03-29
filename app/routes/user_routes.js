@@ -33,6 +33,24 @@ module.exports = (app, db) => {
     });
   });
 
+  app.get('/users', (req, res) => {
+    authenticate(req, res, () => {
+      const filter = req.query.filter || '';
+      db.collection('users')
+        .find(
+          //{...filter}
+        )
+        .toArray((err, docs) => {
+          res.send(docs.map(user => ({
+            id: user._id,
+            username: user.username,
+            admin: ((user.admin !== undefined) ? user.admin : false),
+            moderateShops: ((user.moderateShops !== undefined) ? user.moderateShops : [])
+          })));
+        });
+    });
+  });
+
   app.get('/users/:id/favorites', (req, res) => {
     authenticate(req, res, () => {
       const userObjectId = {_id: new ObjectId(req.params.id)};
