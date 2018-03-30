@@ -35,10 +35,11 @@ module.exports = (app, db) => {
 
   app.get('/users', (req, res) => {
     authenticate(req, res, () => {
-      const filter = req.query.filter || '';
+      let filter = req.query.filter || '';
+      filter = (filter !== '') ? {"username": new RegExp(filter + ".*", 'i')} : {}
       db.collection('users')
         .find(
-          //{...filter}
+          {...filter}
         )
         .toArray((err, docs) => {
           res.send(docs.map(user => ({
