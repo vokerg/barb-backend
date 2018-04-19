@@ -20,6 +20,21 @@ module.exports = (app, db) => {
       addRating(db, ratingInstance, shop => res.send({newAuthor: author, shop}));
     }
   });
+
+  app.get('/users/:id/ratings', (req, res) => {
+    const {id} = req.params;
+    db.collection("shops")
+      .find({'ratings.userId': id})
+      .toArray((err, shops) => {
+        res.send(
+          shops.reduce((array, shop) =>
+            array.concat(shop.ratings
+              .filter(rating => rating.userId === id)
+              .map(rating => ({shopId: shop.id, ...rating})))
+          , [])
+        || []);
+      });
+  });
 };
 
 addRating = (db, ratingInstance, next) => {
