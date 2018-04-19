@@ -14,7 +14,13 @@ const getLoginResponseObject = (user, token=getJwtToken(user.id)) => ({
     moderateShops: ((user.moderateShops !== undefined) ? user.moderateShops : [])
   });
 
+const getSafeUser = user => ({
+  username: user.username,
+  favorites: user.favorites
+})
+
 module.exports = {
   getLoginResponseObject,
-  getJwtToken
+  getJwtToken,
+  getSafeUser
 };

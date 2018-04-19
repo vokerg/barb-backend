@@ -1,5 +1,6 @@
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
 const authenticate = require('../passport/authenticate');
+const { getSafeUser } = require('../utils');
 
 const addFavorites = (user, shopId) => {
   let favorites = user.favorites === undefined ? [] : user.favorites;
@@ -61,6 +62,13 @@ module.exports = (app, db) => {
         }
         res.status(200).send(user.favorites === undefined ? [] : user.favorites);
       });
+    });
+  });
+
+  app.get('/users/:id', (req, res) => {
+    const id = {_id: new ObjectId(req.params.id)};
+    db.collection('users').findOne(id, (err, user) => {
+      res.send(getSafeUser(user));
     });
   });
 }
