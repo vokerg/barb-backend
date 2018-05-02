@@ -4,19 +4,20 @@ const authenticate = require('../passport/authenticate');
 module.exports = (app, db) => {
   app.put('/shops/:id/ratings', (req, res) =>
   {
-    const {userId, shopId, author, rating, comment} = req.body;
+    const {userId, shopId, author, rating, comment, date} = req.body;
+    console.log(req.body);
     if (userId) {
       authenticate(req, res, () => {
         dbUserId = {
           _id: new ObjectId(userId)
         };
         db.collection("users").findOne(dbUserId, (err, user) => {
-          const ratingInstance = {author: user.username, shopId, rating, comment, userId};
+          const ratingInstance = {author: user.username, shopId, rating, comment, userId, date};
           addRating(db, ratingInstance, shop => res.send({newAuthor: user.username, shop}));
         });
       });
     } else {
-      const ratingInstance = {author, shopId, rating, comment, userId:null};
+      const ratingInstance = {author, shopId, rating, comment, userId:null, date};
       addRating(db, ratingInstance, shop => res.send({newAuthor: author, shop}));
     }
   });
@@ -38,7 +39,7 @@ module.exports = (app, db) => {
 };
 
 addRating = (db, ratingInstance, next) => {
-  const {shopId, author, comment, rating, userId} = ratingInstance;
+  const {shopId, author, comment, rating, userId, date} = ratingInstance;
   const id = {
     _id: new ObjectId(shopId)
   };
@@ -47,7 +48,7 @@ addRating = (db, ratingInstance, next) => {
       ...shop,
       ratings:[
         ...shop.ratings,
-        {author, comment, rating, userId}
+        {author, comment, rating, userId, date}
       ]
     };
     db.collection("shops").update(id, shop, (err, result) => {
