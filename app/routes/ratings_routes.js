@@ -4,24 +4,46 @@ const authenticate = require('../passport/authenticate');
 module.exports = (app, db) => {
   app.put('/shops/:id/ratings', (req, res) =>
   {
-    const {userId, shopId, author, rating, comment, date} = req.body;
-    console.log(req.body);
-    if (userId) {
+    let rating = req.body
+    if (rating.userId) {
       authenticate(req, res, () => {
         dbUserId = {
-          _id: new ObjectId(userId)
+          _id: new ObjectId(rating.userId)
         };
         db.collection("users").findOne(dbUserId, (err, user) => {
-          const ratingInstance = {author: user.username, shopId, rating, comment, userId, date};
-          addRating(db, ratingInstance, shop => res.send({newAuthor: user.username, shop}));
+          rating = {...rating, author: user.username}
+          db.collection('ratings').insert(rating, (err, result) => {
+            res.send(rating);
+          });
         });
       });
     } else {
-      const ratingInstance = {author, shopId, rating, comment, userId:null, date};
-      addRating(db, ratingInstance, shop => res.send({newAuthor: author, shop}));
+      db.collection('ratings').insert(rating, (err, result) => {
+        res.send(rating);
+      });
     }
   });
 
+  app.get('/shops/:id/ratings', (req, res) => {
+    db.collection("ratings")
+      .find({shopId:req.params.id})
+      .toArray((err, ratings) => res.send(ratings));
+  });
+
+  app.post('/shops/:shopId/ratings/:id/score', (req, res) => {
+    authenticate(req, res, () => {
+      const {direction} = req.query
+      const id = {_id: new ObjectId(req.params.id)};
+      db.collection('ratings').findOne(id, (err, rating) => {
+        rating = {...rating, score: (rating.score || 0) + ((direction==='positive') ? 1 : -1)}
+        db.collection('ratings').update(id, rating
+        , (err, result) => res.send(rating))
+      })
+
+    })
+  })
+
+  /*should be replaced*/
   app.get('/users/:id/ratings', (req, res) => {
     const {id} = req.params;
     db.collection("shops")
@@ -37,22 +59,3 @@ module.exports = (app, db) => {
       });
   });
 };
-
-addRating = (db, ratingInstance, next) => {
-  const {shopId, author, comment, rating, userId, date} = ratingInstance;
-  const id = {
-    _id: new ObjectId(shopId)
-  };
-  db.collection("shops").findOne(id, (err, shop) => {
-    shop = {
-      ...shop,
-      ratings:[
-        ...shop.ratings,
-        {author, comment, rating, userId, date}
-      ]
-    };
-    db.collection("shops").update(id, shop, (err, result) => {
-      next(shop);
-    });
-  });
-}

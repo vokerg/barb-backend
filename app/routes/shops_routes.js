@@ -40,10 +40,9 @@ module.exports = (app, db) => {
 
   app.put('/shops', (req, res) =>
     authenticate(req, res, () => {
-      let {ratings, services} = req.body
+      let {services} = req.body
       const shop = {
         ...req.body,
-        ratings: (ratings!==undefined) ? ratings : [] ,
         services: (services !== undefined) ? services : []
       };
       db.collection('shops').insert(shop, (err, result) => {
