@@ -71,4 +71,11 @@ module.exports = (app, db) => {
       res.send(getSafeUser(user));
     });
   });
+
+  app.get('/users/:id/votedRatings', (req, res) => {
+    const id = {_id: new ObjectId(req.params.id)};
+    db.collection('users').findOne(id, (err, user) => {
+      res.send(user.voted || []);
+    });
+  });
 }

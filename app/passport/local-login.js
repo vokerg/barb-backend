@@ -1,5 +1,4 @@
 const PassportLocalStrategy = require('passport-local').Strategy;
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 module.exports = db => new PassportLocalStrategy(
@@ -17,8 +16,6 @@ module.exports = db => new PassportLocalStrategy(
             return done(err, false)
           }
           if (res) {
-            //const userId = users[0]._id
-            //const token = getJwtToken(userId);
             done(null, true, users[0])
           }
           else {

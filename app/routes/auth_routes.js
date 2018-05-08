@@ -25,7 +25,6 @@ module.exports = (app) => {
     return passport.authenticate('local-login',
       (error, success, user) => {
         if (!error && success) {
-          //const {userId, token} = user
           return res.json(getLoginResponseObject(user));
         }
         else {

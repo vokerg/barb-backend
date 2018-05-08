@@ -32,12 +32,29 @@ module.exports = (app, db) => {
 
   app.post('/shops/:shopId/ratings/:id/score', (req, res) => {
     authenticate(req, res, () => {
-      const {direction} = req.query
-      const id = {_id: new ObjectId(req.params.id)};
+      const {direction} = req.query;
+      const ratingId = req.params.id;
+      const id = {_id: new ObjectId(ratingId)};
       db.collection('ratings').findOne(id, (err, rating) => {
-        rating = {...rating, score: (rating.score || 0) + ((direction==='positive') ? 1 : -1)}
-        db.collection('ratings').update(id, rating
-        , (err, result) => res.send(rating))
+        rating = {...rating, score: (Number(rating.score || 0)) + ((direction==='positive') ? 1 : -1)}
+        db.collection('ratings').update(id, rating, (err, result) => {
+          if (req.userId) {
+            const dbUserId = {_id: new ObjectId(req.userId)};
+            db.collection('users').findOne(dbUserId, (err, user) => {
+              let voted = user.voted || [];
+              if (!voted.includes(ratingId)) {
+                voted = [...voted, ratingId];
+                db.collection('users').update(dbUserId, {...user, voted}, (err, result) => {
+                  res.send(rating);
+                });
+              } else {
+                res.send(rating);
+              }
+            });
+          } else {
+            res.send(rating);
+          }
+        })
       })
 
     })

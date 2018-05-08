@@ -5,7 +5,7 @@ const getJwtToken = userId => {
   return jwt.sign(payload, require('../config').jwtSecret);
 }
 
-const getLoginResponseObject = (user, token=getJwtToken(user.id)) => ({
+const getLoginResponseObject = (user, token=getJwtToken(user._id)) => ({
     success: true,
     userId: user._id,
     token,
