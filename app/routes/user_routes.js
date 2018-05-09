@@ -78,4 +78,11 @@ module.exports = (app, db) => {
       res.send(user.voted || []);
     });
   });
+
+  app.get('/users/:id/ratingsWritten', (req, res) => {
+    const id = {_id: new ObjectId(req.params.id)};
+    db.collection('users').findOne(id, (err, user) => {
+      res.send(user.ratingsWritten || []);
+    });
+  });
 }

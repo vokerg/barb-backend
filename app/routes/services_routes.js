@@ -1,9 +1,9 @@
 var {ObjectId} = require('mongodb');
 
-module.exports = (app, db) => {
-  app.get('/services/', (req, res) => {
-    db.collection("shops").distinct("services", (err, docs) => {
-      res.send(docs)
-    })
-  });
+const router = require('express').Router();
+
+module.exports = db => {
+  router.route('')
+    .get((req, res) => db.collection("shops").distinct("services", (err, docs) => res.send(docs)));
+  return router;
 };
