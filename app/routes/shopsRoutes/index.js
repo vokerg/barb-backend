@@ -28,8 +28,9 @@ module.exports = db => {
 
   router.use('/:id', (req, res, next) => {
     req.shopId = req.params.id;
+    req.dbShopId = {_id: new ObjectId(req.params.id)};
     next();
-  }, require('./shop_routes')(db));
+  }, require('./shopRoutes')(db));
 
   return router;
 };

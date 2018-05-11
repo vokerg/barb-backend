@@ -30,7 +30,7 @@ module.exports = db => {
 
     .get((req, res) => db.collection("ratings").find({shopId:req.shopId}).toArray((err, ratings) => res.send(ratings)));
 
-  router.route('/:ratingId/score').post((req, res) => {
+  router.route('/:ratingId/score').post((req, res) =>
     authenticate(req, res, () => {
       const {ratingId} = req.params;
       const id = {_id: new ObjectId(ratingId)};
@@ -53,8 +53,8 @@ module.exports = db => {
           }
         });
       });
-    });
-  });
+    })
+  );
 
   return router;
 

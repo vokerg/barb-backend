@@ -1,8 +1,10 @@
 const https = require("https");
 const { getLoginResponseObject } = require("../utils");
 
-module.exports = (app, db) => {
-  app.post('/login/facebook', (request, response) => {
+const router = require('express').Router();
+
+module.exports = db => {
+  router.route('').post((request, response) => {
     https.get('https://graph.facebook.com/me?access_token=' + request.body.accessToken,
       resp => {
         let data = '';
@@ -36,4 +38,6 @@ module.exports = (app, db) => {
         response.status(401).json({error: "Can't verify data"});
       });
   });
+
+  return router;
 }
