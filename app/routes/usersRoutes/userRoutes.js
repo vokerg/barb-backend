@@ -1,4 +1,3 @@
-const { ObjectId } = require('mongodb');
 const authenticate = require('../../passport/authenticate');
 const { getSafeUser } = require('../../utils');
 

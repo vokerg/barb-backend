@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const authenticate = require('../../passport/authenticate');
 
 const addFavoriteShopToUserObject = (user, shopId) => {
