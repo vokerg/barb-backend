@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const authenticate = require('../../passport/authenticate');
-const { getAggregateBookingsJson, getSearchTimeObject } = require("../../mongoHelper");
+const { getAggregateBookings } = require("../../utils");
 
 module.exports = db => {
   const router = require('express').Router();
@@ -22,13 +22,9 @@ module.exports = db => {
   )
 
   .get((req, res) => authenticate(req, res, () => {
-    let
-      {status, time} = req.query,
-      timeObject = getSearchTimeObject(time),
-      statusObject = (status === undefined || status==='All') ? {} : {'status': status};
-
+    const {status, time} = req.query;
       db.collection("bookings")
-        .aggregate(getAggregateBookingsJson(req.shopId, {...timeObject, ...statusObject}))
+        .aggregate(getAggregateBookings(req.shopId, null, status, time))
         .toArray((err, bookings) => res.send(bookings))
   }));
 

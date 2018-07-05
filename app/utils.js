@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+const { ObjectId } = require('mongodb');
+
+const { getAggregateBookingsJson } = require ('./mongoHelper');
 
 const getJwtToken = userId => {
   const payload = {userId};
@@ -19,8 +22,40 @@ const getSafeUser = user => ({
   favorites: user.favorites
 })
 
+const getAggregateBookings = (shopId, userId, status, time) => {
+  const aggregateJson = getAggregateBookingsJson();
+  let match = {};
+
+  if (shopId) {
+    const shopIdDb = {shopId: new ObjectId(shopId)};
+    match = {...match, ...shopIdDb}
+  }
+
+  if (userId) {
+    const userIdDb = {userId: new ObjectId(userId)};
+    match = {...match, ...userIdDb}
+  }
+
+  if (status) {
+    statusObject = (status === undefined || status==='All') ? {} : {'status': status};
+    match = {...match, ...statusObject}
+  }
+
+  if (time) {
+    timeObject = getSearchTimeObject(time);
+    match = {...match, ...timeObject}
+  }
+
+  aggregateJson.push({
+    $match:{...match}
+  });
+
+  return aggregateJson;
+}
+
 module.exports = {
   getLoginResponseObject,
   getJwtToken,
-  getSafeUser
+  getSafeUser,
+  getAggregateBookings
 };

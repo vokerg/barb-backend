@@ -22,8 +22,9 @@ module.exports = db => {
   );
 
   router.use('/:id', (req, res, next) => {
-    req.userId = req.params.id;
-    req.dbUserId = {_id: new ObjectId(req.params.id)};
+    const {id} = req.params;
+    req.userId = req.requestUserId = id;
+    req.dbUserId = {_id: new ObjectId(id)};
     next();
   }, require('./userRoutes')(db));
 

@@ -1,6 +1,4 @@
-const { ObjectId } = require('mongodb');
-
-const getAggregateBookingsJson = (id, match) => {
+const getAggregateBookingsJson = () => {
   let aggregateJson = [
       {
         $lookup: {
@@ -37,12 +35,6 @@ const getAggregateBookingsJson = (id, match) => {
         }
       }
     ];
-
-    if (Object.keys(match).length > 0){
-        aggregateJson.push({
-          $match:{...match}
-        });
-    }
     return aggregateJson;
   }
 
