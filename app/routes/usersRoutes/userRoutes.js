@@ -1,21 +1,23 @@
 const authenticate = require('../../passport/authenticate');
 const { getSafeUser } = require('../../utils');
-const { getAggregateBookings } = require("../../utils");
+const { handleDbUser } = require("../../dbUtils");
 
 module.exports = db => {
   const router = require('express').Router();
 
-  router.route('')
-    .get((req, res) => db.collection('users').findOne(req.dbUserId, (err, user) => res.send(getSafeUser(user))));
+  const handleDbUserForUserRoutes = handleDbUser(db);
+  const handleDbUserAuthenticated = (req, res, handle) => authenticate(req, res, () => handleDbUserForUserRoutes(req.dbUserId)(handle))
 
-  router.use('/favorites', require('./favoriteRoutes')(db));
+  router.route('')
+    .get((req, res) => handleDbUserAuthenticated(req, res, user => res.send(getSafeUser(user))));
 
   router.route('/votedRatings')
-    .get((req, res) => db.collection('users').findOne(req.dbUserId, (err, user) => res.send(user.voted || [])));
+    .get((req, res) => handleDbUserAuthenticated(req, res, user => res.send(user.voted || [])));
 
   router.route('/ratingsWritten')
-    .get((req, res) => db.collection('users').findOne(req.dbUserId, (err, user) => res.send(user.ratingsWritten || [])));
+    .get((req, res) => handleDbUserAuthenticated(req, res, user => res.send(user.ratingsWritten || [])));
 
+  router.use('/favorites', require('./favoriteRoutes')(db));
   router.use('/bookings', require('../bookingRoutes')(db));
 
   return router;
