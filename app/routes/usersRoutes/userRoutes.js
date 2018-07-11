@@ -16,13 +16,7 @@ module.exports = db => {
   router.route('/ratingsWritten')
     .get((req, res) => db.collection('users').findOne(req.dbUserId, (err, user) => res.send(user.ratingsWritten || [])));
 
-  router.route('/bookings')
-    .get((req, res) => authenticate(req, res, () => {
-      const {status, time} = req.query;
-        db.collection("bookings")
-          .aggregate(getAggregateBookings(null, req.requestUserId, status, time))
-          .toArray((err, bookings) => res.send(bookings))
-    }));
+  router.use('/bookings', require('../bookingRoutes')(db));
 
   return router;
 }

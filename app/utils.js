@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { ObjectId } = require('mongodb');
 
-const { getAggregateBookingsJson } = require ('./mongoHelper');
+const { getAggregateBookingsJson, getSearchTimeObject } = require ('./mongoHelper');
 
 const getJwtToken = userId => {
   const payload = {userId};

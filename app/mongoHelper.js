@@ -29,6 +29,7 @@ const getAggregateBookingsJson = () => {
             "shopId": 1,
             "status": 1,
             "date": 1,
+            "service": 1,
             "comment": 1,
             "shopname": "$shops_docs.name",
             "username": "$users_docs.username"

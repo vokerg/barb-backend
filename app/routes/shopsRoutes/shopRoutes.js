@@ -18,7 +18,7 @@ module.exports = db => {
 
   router.use('/ratings', require('./ratingsRoutes')(db));
 
-  router.use('/bookings', require('./bookingRoutes')(db));
+  router.use('/bookings', require('../bookingRoutes')(db));
 
   return router;
 }
