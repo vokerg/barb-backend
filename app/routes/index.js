@@ -1,4 +1,7 @@
+const authenticate = require('../passport/authenticate');
+
 module.exports = (app, db) => {
+  app.use('/', authenticate.resolveToken)
   app.use('/signup/', require('./signupRoutes'));
   app.use('/login/', require('./loginRoutes'));
   app.use('/login/facebook', require('./socialRoutes'));

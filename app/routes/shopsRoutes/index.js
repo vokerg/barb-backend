@@ -8,11 +8,22 @@ module.exports = db => {
   router.route('')
     .get((req, res) => {
       let {filter, service} = req.query;
-      filter = filter==='favorites' ? {'favorited':'true'} : {};
       service = (service!=='' && (service !== undefined)) ? {'services':service} : {};
-      db.collection('shops')
-        .find({...filter, ...service})
-        .toArray((err, docs) => res.send(docs));
+
+      const findShops = filter => db.collection('shops')
+                .find({...filter, ...service})
+                .toArray((err, docs) => res.send(docs));
+      const {userId} = req;
+      if (filter === 'favorites' && userId) {
+        db.collection('users').findOne(({_id: new ObjectId(userId)}), (err, user) => {
+          if (user.favorites) {
+            const favoriteShopIds = user.favorites.map(id=>(new ObjectId(id)));
+            findShops({_id: { $in: [...favoriteShopIds]}});
+          }
+        })
+      } else {
+        return findShops();
+      }
     })
 
     .put((req, res) =>
