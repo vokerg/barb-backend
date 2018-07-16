@@ -20,7 +20,7 @@ MongoClient.connect(require('./config').db, (err, database) => {
   if (err) return console.log(err);
   require('./app/routes')(app, barbDb);
   const port = 8000;
-  app.listen(port, () => {
-    console.log("Listening carefully on port", port);
+  app.listen(process.env.PORT || port, () => {
+    console.log("Listening carefully on port", process.env.PORT || port);
   });
 });
