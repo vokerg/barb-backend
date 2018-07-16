@@ -7,11 +7,11 @@ const router = require('express').Router();
 module.exports = db => {
   router.route('')
     .get((req, res) => {
-      let {filter, service} = req.query;
-      service = (service!=='' && (service !== undefined)) ? {'services':service} : {};
+      let {filter, services} = req.query;
+      services = (services!=='' && (services !== undefined) && services !== []) ? {services: {$in: [...services]}} : {};
 
       const findShops = filter => db.collection('shops')
-                .find({...filter, ...service})
+                .find({...filter, ...services})
                 .toArray((err, docs) => res.send(docs));
       const {userId} = req;
       if (filter === 'favorites' && userId) {
