@@ -5,7 +5,7 @@ const { getAggregateBookingsJson, getSearchTimeObject } = require ('./mongoHelpe
 
 const getJwtToken = userId => {
   const payload = {userId};
-  return jwt.sign(payload, require('../config').jwtSecret);
+  return jwt.sign(payload, require('../config').getJwtSecret());
 }
 
 const getLoginResponseObject = (user, token=getJwtToken(user._id)) => ({
